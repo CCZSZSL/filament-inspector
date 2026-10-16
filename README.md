@@ -3,9 +3,9 @@
 Camera-based filament diameter inspection using a Raspberry Pi camera server, a Python/Tkinter host application, and a read-only browser dashboard. This repository publishes the v14.7.2 project package.
 
 ## Authors
-
+- [lyin1252-stack](https://github.com/lyin1252-stack)
 - [CCZSZSL](https://github.com/CCZSZSL)
-- [lyin1252-stack](https://github.com/lyin1252-stack) — co-author
+
 
 ## Features
 
