@@ -5,9 +5,9 @@ Camera-based filament diameter inspection using a Raspberry Pi camera server, a 
 This branch reorganizes v14.7.2 into a functional Python package. Measurement formulas and saved calibration formats are preserved. See [the architecture and migration guide](docs/ARCHITECTURE.md).
 
 ## Authors
-
+- [lyin1252-stack](https://github.com/lyin1252-stack)
 - [CCZSZSL](https://github.com/CCZSZSL)
-- [lyin1252-stack](https://github.com/lyin1252-stack) — co-author
+
 
 ## Features
 
