@@ -2,9 +2,9 @@
 import unittest
 import numpy as np
 import cv2
-from filament_three_view_core_v13 import new_view
-from filament_seed_guided_v1462 import sample_record,build_model,SeedDetectionError
-from filament_dynamic_fusion_v1463 import locate_dynamic,measure_dynamic
+from filament_inspector.algorithms.views import new_view
+from filament_inspector.algorithms.seed import sample_record,build_model,SeedDetectionError
+from filament_inspector.algorithms.dynamic import locate_dynamic,measure_dynamic
 
 class DynamicFusionTests(unittest.TestCase):
     def setUp(self):

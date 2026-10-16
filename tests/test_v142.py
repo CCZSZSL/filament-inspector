@@ -6,9 +6,9 @@ from tempfile import TemporaryDirectory
 from unittest.mock import patch
 import cv2
 import numpy as np
-from filament_silhouette_v142 import process_silhouette_view
-from filament_three_view_core_v13 import new_view
-from filament_diameter_ui_v142_silhouette import SilhouetteThreeViewUI
+from filament_inspector.algorithms.silhouette import process_silhouette_view
+from filament_inspector.algorithms.views import new_view
+from filament_inspector.ui.silhouette import SilhouetteThreeViewUI
 
 ROOT=Path(__file__).resolve().parents[1]
 

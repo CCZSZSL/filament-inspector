@@ -1,9 +1,9 @@
 """Offline tests of the v14.6.3-F virtual fused mirror output."""
 import unittest,cv2,numpy as np
 from unittest.mock import patch
-from filament_f_direct_fusion_v1463 import fuse_mirror_views,MirrorFusionError
-from filament_seed_guided_v1462 import sample_record,build_model
-from filament_diameter_ui_v1463_f_direct import FDirectTwoMirrorUI
+from filament_inspector.algorithms.fusion import fuse_mirror_views,MirrorFusionError
+from filament_inspector.algorithms.seed import sample_record,build_model
+from filament_inspector.ui.fusion import FDirectTwoMirrorUI
 
 
 def dummy(value,unit='mm',scale=.027):
@@ -98,8 +98,8 @@ class GuiFusionTests(unittest.TestCase):
             for n in ('left','right'):
                 app._selected_name=n
                 app._refresh_fields()
-                with patch('filament_diameter_ui_v1463_f_direct.messagebox.askyesno',return_value=True), \
-                     patch('filament_diameter_ui_v1463_f_direct.messagebox.showinfo'):
+                with patch('filament_inspector.ui.fusion.messagebox.askyesno',return_value=True), \
+                     patch('filament_inspector.ui.fusion.messagebox.showinfo'):
                     app._calibrate_mirror_scale()
                 cal=app.views[n]['local_scale_calibration']
                 self.assertEqual(cal['schema'],'mirror_local_scale_v142')

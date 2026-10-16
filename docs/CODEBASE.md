@@ -1,5 +1,7 @@
 # Codebase cleanup audit
 
+**Historical snapshot:** this audit describes the first cleanup on `main`, before the modular-framework branch. The file names and 38-file layout below are historical. For the current branch, see [architecture](ARCHITECTURE.md).
+
 Reviewed on 16 October 2026 against the original public commit [`2005c15`](https://github.com/CCZSZSL/filament-inspector/tree/2005c151068def0fabea945bc5f7ea99d9832dda).
 
 ## Retention rule

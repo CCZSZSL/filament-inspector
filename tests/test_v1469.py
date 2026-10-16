@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from unittest import mock
 
-from filament_profile_v1469 import ProfileRecorder, radius_mesh_sections, row_measurements
+from filament_inspector.recording.profile import ProfileRecorder, radius_mesh_sections, row_measurements
 
 
 def add(r, t, f=1.75, source='continuous', feed=True, speed=20):
@@ -108,8 +108,8 @@ class GuiSmokeTests(unittest.TestCase):
     def test_inherited_interface_and_graphs_open(self):
         # Must run within xvfb or on a desktop; skipped if headless.
         try:
-            from filament_diameter_ui_v1469 import FilamentUIV1469
-            win=FilamentUIV1469()
+            from filament_inspector.ui.profile import ProfileUI
+            win=ProfileUI()
         except Exception as exc:
             if 'display' in str(exc).lower():self.skipTest('No Tk display')
             raise

@@ -6,4 +6,4 @@ if [[ ! -x .venv/bin/python ]]; then
   read -k 1 '?Press any key to close...'
   exit 1
 fi
-exec .venv/bin/python filament_diameter_ui_v1472.py
+exec .venv/bin/python -m filament_inspector

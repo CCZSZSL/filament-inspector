@@ -11,8 +11,8 @@ from unittest import mock
 from urllib.request import Request,urlopen
 from urllib.error import HTTPError
 
-from filament_web_v1470 import DashboardStore, LanDashboardServer, csv_from_rows
-from filament_profile_v1469 import ProfileRecorder
+from filament_inspector.web.server import DashboardStore, LanDashboardServer, csv_from_rows
+from filament_inspector.recording.profile import ProfileRecorder
 
 class ServerTests(unittest.TestCase):
     def setUp(self):
@@ -44,7 +44,7 @@ class ServerTests(unittest.TestCase):
         self.assertEqual(x['measurements'][0]['left_y_px'],2080.5)
         self.assertEqual(x['measurements'][0]['f_direct_mm'],1.75)
         self.assertEqual(x['mode'],'continuous')
-        for bad in ['/api/start','/api/stop','/../filament_diameter_ui_v1469.py','/secret','/api/camera','/api/calibrate']:
+        for bad in ['/api/start','/api/stop','/../filament_inspector.ui.profile.py','/secret','/api/camera','/api/calibrate']:
             with self.assertRaises(HTTPError) as ex:urlopen(self.base+bad,timeout=3)
             self.assertEqual(ex.exception.code,404)
         with self.assertRaises(HTTPError) as ex:
@@ -92,8 +92,8 @@ class ServerTests(unittest.TestCase):
 class TkSmoke(unittest.TestCase):
     def setUp(self):
         try:
-            from filament_diameter_ui_v1470 import FilamentUIV1470
-            self.ui=FilamentUIV1470()
+            from filament_inspector.ui.dashboard import DashboardUI
+            self.ui=DashboardUI()
         except Exception as exc:
             if 'display' in str(exc).lower():self.skipTest('Headless Tk; run xvfb for full GUI')
             raise
@@ -106,7 +106,7 @@ class TkSmoke(unittest.TestCase):
         for name in ['exp_static_button','exp_motion_button','continuous_button','profile_open_button',
                      'web_start_button','web_copy_button','web_stop_button','web_open_button']:
             self.assertTrue(getattr(u,name).winfo_exists())
-        with mock.patch('filament_diameter_ui_v1470.network_addresses',return_value=['192.168.20.25']):
+        with mock.patch('filament_inspector.ui.dashboard.network_addresses',return_value=['192.168.20.25']):
             # Avoid external port collisions; inspect URL before launch.
             u.web_port.set('0')  # invalid public setting; no side effect
             with mock.patch('tkinter.messagebox.showerror'):
@@ -151,7 +151,7 @@ class TkSmoke(unittest.TestCase):
             self.assertIsNone(row['f_direct_mm'])
 
     def test_measurement_published_after_inherited_computation(self):
-        from filament_diameter_ui_v1469 import FilamentUIV1469
+        from filament_inspector.ui.profile import ProfileUI
         u=self.ui
         class Engine:
             widths_px=[61.2]*40
@@ -170,7 +170,7 @@ class TkSmoke(unittest.TestCase):
             self.profile_recorder.append(at_s=time.monotonic(),timestamp='2026-10-14T22:00:00+11:00',
                source='manual',left_mm=1.75,right_mm=1.75,f_direct_mm=1.75,
                delta_lr_mm=0,status='VALID_MM')
-        with mock.patch.object(FilamentUIV1469,'_v14_process_all',fake_measure):
+        with mock.patch.object(ProfileUI,'_v14_process_all',fake_measure):
             u._v14_process_all()
         row=u._web_store.snapshot()['measurements'][0]
         self.assertEqual(row['left_y_px'],2090)

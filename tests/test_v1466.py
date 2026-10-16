@@ -5,13 +5,13 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 import numpy as np
-from filament_f_direct_fusion_v1463 import fuse_mirror_views, MirrorFusionError
-from filament_flexible_calibration_v1466 import (
+from filament_inspector.algorithms.fusion import fuse_mirror_views, MirrorFusionError
+from filament_inspector.calibration.local import (
     CalibrationError, frame_record, aggregate_records, make_scale,
     validate_scale, FRAME_COUNT,
 )
-from filament_three_view_core_v13 import new_view
-from filament_diameter_ui_v1466 import FilamentUIV1466, validate_saved_state
+from filament_inspector.algorithms.views import new_view
+from filament_inspector.ui.local_calibration import LocalCalibrationUI, validate_saved_state
 
 
 def record(px=63.0,quality=.95,cols=40,center=100.,res=.25):
@@ -84,9 +84,9 @@ class FlexibleCoreTest(unittest.TestCase):
 class GUIV1466Test(unittest.TestCase):
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory()
-        self.patch=patch('filament_diameter_ui_v1466.AUTOSAVE',Path(self.tmp.name)/'state.json')
+        self.patch=patch('filament_inspector.ui.local_calibration.AUTOSAVE',Path(self.tmp.name)/'state.json')
         self.patch.start()
-        self.app=FilamentUIV1466()
+        self.app=LocalCalibrationUI()
         self.app.update_idletasks()
     def tearDown(self):
         self.app._close_app()
@@ -137,7 +137,7 @@ class GUIV1466Test(unittest.TestCase):
         app._calibration_job={'views':('left','right'),'reference':1.75,
             'samples':{'left':[record(center=140)]*10,'right':[record(center=360)]*3},
             'camera':{'lens_position':'9.750'}, 'attempted':10,'awaiting':False}
-        with patch('filament_diameter_ui_v1466.messagebox.showerror'):
+        with patch('filament_inspector.ui.local_calibration.messagebox.showerror'):
             app._finish_calibration()
         self.assertEqual(app.views['left']['local_scale_calibration'],old)
         self.assertIsNone(app.views['right']['local_scale_calibration'])
@@ -148,7 +148,7 @@ class GUIV1466Test(unittest.TestCase):
             'samples':{'left':[record(65.0,center=140)]*10,
                        'right':[record(67.0,center=360)]*10},
             'camera':{'lens_position':'9.750'}, 'attempted':10,'awaiting':False}
-        with patch('filament_diameter_ui_v1466.messagebox.showinfo'):
+        with patch('filament_inspector.ui.local_calibration.messagebox.showinfo'):
             app._finish_calibration()
         self.assertAlmostEqual(app.views['left']['local_scale_calibration']['mm_per_px'],1.9345/65)
         self.assertAlmostEqual(app.views['right']['local_scale_calibration']['mm_per_px'],1.9345/67)
@@ -200,8 +200,8 @@ class GUIV1466Test(unittest.TestCase):
            'confidence_heuristic':.95},None)
         app.live_controls.native_size_wh=(4608,2592)
         with patch.object(app.live_controls,'_capture') as capture, \
-             patch('filament_diameter_ui_v1466.measure_dynamic',return_value=fake_measure), \
-             patch('filament_diameter_ui_v1466.messagebox.showinfo'):
+             patch('filament_inspector.ui.local_calibration.measure_dynamic',return_value=fake_measure), \
+             patch('filament_inspector.ui.local_calibration.messagebox.showinfo'):
             for i in range(FRAME_COUNT):
                 app._next_calibration_frame()
                 self.assertTrue(app._calibration_job['awaiting'])

@@ -9,13 +9,13 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 import numpy as np
-from filament_diameter_ui_v1467 import FilamentUIV1467
-from filament_diameter_ui_v1466 import FilamentUIV1466
-from filament_flexible_calibration_v1466 import CalibrationError, make_scale
-from filament_position_compensation_v1467 import (
+from filament_inspector.ui.position import PositionCompensationUI
+from filament_inspector.ui.local_calibration import LocalCalibrationUI
+from filament_inspector.calibration.local import CalibrationError, make_scale
+from filament_inspector.calibration.position import (
     initial_profile, validate_profile, profile_ready, with_position_point, scale_at_position)
-from filament_three_view_core_v13 import new_view
-from filament_f_direct_fusion_v1463 import fuse_mirror_views, MirrorFusionError
+from filament_inspector.algorithms.views import new_view
+from filament_inspector.algorithms.fusion import fuse_mirror_views, MirrorFusionError
 
 
 def records(p,y):
@@ -104,7 +104,7 @@ class PositionCoreTest(unittest.TestCase):
 class GuiTest(unittest.TestCase):
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory()
-        self.app=FilamentUIV1467()
+        self.app=PositionCompensationUI()
         self.app.withdraw()
         self.app.image_cv_raw=np.zeros((2592,4608),dtype=np.uint8)
         for n,center in [('left',100),('right',400)]:
@@ -168,7 +168,7 @@ class GuiTest(unittest.TestCase):
         old={n:deepcopy(self.app.views[n]['position_scale_profile']) for n in ('left','right')}
         self.app._calibration_job={'purpose':'y_position','views':('left','right'),
             'samples':{'left':records(62,150),'right':records(64,400)},'reference':1.75}
-        with patch('filament_diameter_ui_v1466.messagebox.showerror'):
+        with patch('filament_inspector.ui.local_calibration.messagebox.showerror'):
             self.app._finish_calibration()
         self.assertIsNone(self.app._calibration_job)
         for n in old:self.assertEqual(old[n],self.app.views[n]['position_scale_profile'])
@@ -178,17 +178,17 @@ class GuiTest(unittest.TestCase):
             'samples':{'left':records(62.1,80),'right':records(62.1,380)},'reference':1.75}
         path=Path(self.temp.name)/'setup.json'
         with patch.object(self.app,'_save_setup',return_value=True), \
-             patch('filament_diameter_ui_v1467.messagebox.showinfo'):
+             patch('filament_inspector.ui.position.messagebox.showinfo'):
             self.app._finish_calibration()
         for n in ('left','right'):
             self.assertEqual(len(self.app.views[n]['position_scale_profile']['points']),2)
 
     def test_continuous_start_stop_and_log(self):
-        from filament_diameter_ui_v1467 import ROOT
+        from filament_inspector.ui.position import ROOT
         lc=self.app.live_controls
         lc.background_epoch=('s','f','e')
         self.app.background_cv=object()
-        with patch('filament_diameter_ui_v1467.ROOT',Path(self.temp.name)), \
+        with patch('filament_inspector.ui.position.ROOT',Path(self.temp.name)), \
              patch.object(self.app,'_check_mirror_prereqs'),patch.object(lc,'_schedule_auto'):
             self.app._toggle_continuous_button()
             self.assertTrue(lc.continuous.get())
@@ -223,7 +223,7 @@ class GuiTest(unittest.TestCase):
                          'confidence_heuristic':.99,'roi':[700,0,739,200]}
             this.engines[n]=SimpleNamespace(valid=np.ones(40,bool),widths_px=np.full(40,p),
                  diameters_mm=None,reference_correction_factor=None)
-        with patch.object(FilamentUIV1466,'_process_one',autospec=True,side_effect=fake_parent_process):
+        with patch.object(LocalCalibrationUI,'_process_one',autospec=True,side_effect=fake_parent_process):
             for n in ('left','right'):app._process_one(n)
         for n in ('left','right'):
             m=app.view_results[n]

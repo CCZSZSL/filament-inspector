@@ -2,6 +2,8 @@
 
 Camera-based filament diameter inspection using a Raspberry Pi camera server, a Python/Tkinter host application, and a read-only browser dashboard. This repository publishes the v14.7.2 project package.
 
+This branch reorganizes v14.7.2 into a functional Python package. Measurement formulas and saved calibration formats are preserved. See [the architecture and migration guide](docs/ARCHITECTURE.md).
+
 ## Authors
 
 - [CCZSZSL](https://github.com/CCZSZSL)
@@ -22,10 +24,11 @@ The host workflow targets macOS. Install Python 3 with Tkinter (check with `pyth
 ```bash
 git clone https://github.com/CCZSZSL/filament-inspector.git
 cd filament-inspector
+git switch refactor/modular-framework
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
-python filament_diameter_ui_v1472.py
+python -m filament_inspector
 ```
 
 Alternatively run `zsh START_v1472_Mac.command` after preparing the environment. No personal calibration, camera images or measurement logs are included. Configure your camera connection, acquire an empty background, set the ROI, and calibrate for your geometry before measuring.
@@ -35,10 +38,10 @@ Alternatively run `zsh START_v1472_Mac.command` after preparing the environment.
 Use Raspberry Pi OS with a supported camera and Picamera2/libcamera installed through the operating system. The Pi also needs OpenCV and NumPy. The host `requirements.txt` does not install the Pi camera stack.
 
 ```bash
-python3 pi_live_camera_server_v1471.py --help
+python3 -m filament_inspector.camera --help
 ```
 
-See [the current setup guide](docs/SETUP.md) for camera parameters and SSH forwarding. The retained `pi_live_camera_server_v1471.py` supports both full-frame and Fast ROI acquisition. Run only one camera server at a time. Verify focus, exposure, gain and geometry before acquiring a background. Avoid port conflicts between the camera tunnel and host dashboard.
+See [the current setup guide](docs/SETUP.md) for camera parameters and SSH forwarding. The camera module supports both full-frame and Fast ROI acquisition. Copy the complete package to the Pi; the old filename is now only a compatibility launcher and cannot be deployed alone. Run only one camera server at a time. Verify focus, exposure, gain and geometry before acquiring a background. Avoid port conflicts between the camera tunnel and host dashboard.
 
 ## Dashboard and data
 
@@ -64,19 +67,32 @@ Some tests create Tk windows and require a graphical desktop (or a virtual displ
 
 The `-X utf8` option avoids decoding failures on Windows installations whose default encoding is GBK.
 
+With the original Git history available, compare deterministic measurements against the pre-refactor baseline:
+
+```bash
+python -X utf8 tools/compare_baseline.py
+```
+
+The baseline comparison uses synthetic images and checks numerical results, validity and rejection behavior; it is not an optical accuracy test.
+
 ## Layout
 
-- `filament_diameter_ui_v1472.py`: current host entry point.
-- `filament_*.py`: acquisition, calibration, measurement and interface modules.
-- `pi_live_camera_server_v1471.py`: camera service supporting full-frame and optional Fast ROI acquisition.
-- `web_v1472/`: current dashboard assets.
-- `web_v1470/`: base dashboard retained for the inherited v14.7.0 UI and its tests.
-- `tests/`: offline regression tests, including Fast ROI tests against the current UI.
+- `filament_inspector/algorithms/`: edge extraction, ROI localization, seed tracking and fusion; independent of Tk.
+- `filament_inspector/calibration/`: scale calibration and position compensation.
+- `filament_inspector/acquisition/`: native-pixel ROI transport validation.
+- `filament_inspector/recording/`: experiment records and axial profiles.
+- `filament_inspector/ui/`: Tk screens, controls and orchestration, named by responsibility.
+- `filament_inspector/web/`: one read-only HTTP service and one set of dashboard assets.
+- `filament_inspector/camera.py`: Raspberry Pi camera service.
+- `filament_inspector/paths.py`: common configuration/capture/log root.
+- `tests/`: regression tests and package-boundary checks.
+- `tools/compare_baseline.py`: repeatable old/new measurement comparison.
 - `docs/SETUP.md`: current camera/host setup.
 - `docs/history/`: historical release notes, not current launch instructions.
-- `docs/CODEBASE.md`: retained dependencies and reasons for removing superseded files.
+- `docs/ARCHITECTURE.md`: current architecture, entry points, migration and remaining constraints.
+- `docs/CODEBASE.md`: audit of the earlier cleanup before this refactor.
 
-The 38 retained Python runtime files form the import closure of the current host and camera entry points. Older filenames often identify active parent classes, not unused applications. See the [codebase audit](docs/CODEBASE.md) before removing or relocating them; several also resolve configuration and capture paths relative to their own file location.
+The old host and camera executable filenames still work as small compatibility launchers. Internal versioned imports have been replaced by package imports. By default, configuration, captures and logs remain at the repository root, as before. Set `FILAMENT_INSPECTOR_DATA_DIR` before launching to select another writable data root; no files are automatically migrated.
 
 ## License
 

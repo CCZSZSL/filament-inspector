@@ -4,7 +4,7 @@ import unittest
 from unittest import mock
 import numpy as np
 import cv2
-from filament_fast_roi_v1471 import choose_band, sensor_row_range, install_band_in_place, decode_validate_roi_png
+from filament_inspector.acquisition.roi import choose_band, sensor_row_range, install_band_in_place, decode_validate_roi_png
 
 
 class RoiTests(unittest.TestCase):
@@ -62,7 +62,7 @@ class RoiTests(unittest.TestCase):
         self.assertTrue(np.array_equal(from_full,from_crop))
 
     def test_current_web_retains_heatmap_controls(self):
-        from filament_web_v1472 import WEB_DIR
+        from filament_inspector.web.server import WEB_DIR
         self.assertTrue((WEB_DIR/'dashboard.js').is_file())
         html=(WEB_DIR/'index.html').read_text(encoding='utf-8')
         self.assertIn('heatRejected',html)
@@ -78,7 +78,7 @@ class PiServiceTests(unittest.TestCase):
                                           'libcamera':types.ModuleType('libcamera')}):
             sys.modules['picamera2'].Picamera2=object
             sys.modules['libcamera'].controls=object
-            spec=importlib.util.spec_from_file_location('pi_fast_stub_v1471',Path(__file__).resolve().parents[1]/'pi_live_camera_server_v1471.py')
+            spec=importlib.util.spec_from_file_location('pi_fast_stub_v1471',Path(__file__).resolve().parents[1]/'filament_inspector'/'camera.py')
             mod=importlib.util.module_from_spec(spec);spec.loader.exec_module(mod)
             s=mod.CameraService.__new__(mod.CameraService)
             class FakeCamera:
@@ -113,8 +113,8 @@ class UITests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         try:
-            from filament_diameter_ui_v1472 import FilamentUIV1472
-            cls.cls=FilamentUIV1472
+            from filament_inspector.ui.app import FilamentInspectorApp
+            cls.cls=FilamentInspectorApp
         except Exception as exc:
             raise unittest.SkipTest(str(exc))
 

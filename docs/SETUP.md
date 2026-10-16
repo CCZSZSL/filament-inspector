@@ -1,19 +1,21 @@
 # Current setup
 
-Use `filament_diameter_ui_v1472.py` on the host and `pi_live_camera_server_v1471.py` on the Raspberry Pi. Run commands from the repository root. The numbered notes in `history/` describe earlier packages and can refer to files no longer present in the current tree.
+Run `python -m filament_inspector` on the host and `python3 -m filament_inspector.camera` on the Raspberry Pi, from the repository root. The numbered notes in `history/` describe earlier packages and can refer to files no longer present in the current tree.
+
+For this refactor, copy or clone the complete repository/package onto each machine. The two old executable filenames remain as launchers but no longer contain standalone implementations. Do not upload only the old Pi launcher. Existing deployments are not automatically upgraded by changing this Git branch.
 
 ## Camera service
 
 Use Raspberry Pi OS with a supported camera, Picamera2/libcamera, OpenCV and NumPy. Inspect available arguments:
 
 ```bash
-python3 pi_live_camera_server_v1471.py --help
+python3 -m filament_inspector.camera --help
 ```
 
 For an already working rig, retain its established camera arguments and calibration geometry. The following is only an example, not a calibration recommendation:
 
 ```bash
-python3 pi_live_camera_server_v1471.py --host 127.0.0.1 --port 8765 --fps 8 --lens-position 9.515 --exposure-us 10000 --gain 1.0
+python3 -m filament_inspector.camera --host 127.0.0.1 --port 8765 --fps 8 --lens-position 9.515 --exposure-us 10000 --gain 1.0
 ```
 
 The same service provides `/snapshot.png`, `/stream.mjpg`, `/status` and the optional `/snapshot_roi.png` route. Full-frame measurement does not require the removed v14.5 server.
@@ -36,6 +38,8 @@ Keep that terminal running. The host camera URL is then `http://127.0.0.1:8765`.
 6. Preserve host-side logs for complete experiments; browser export is limited to the published history.
 
 Changing camera settings or the optical geometry can invalidate the background or calibration. A previous user's calibration is not a substitute for calibrating your own rig.
+
+Writable paths default to the repository root so the existing `config/`, `captures_live*/` and `measurements*/` names remain usable. To use another directory, set `FILAMENT_INSPECTOR_DATA_DIR` before starting Python. Dashboard static assets stay inside the package and are not loaded from that data directory. Preserve and verify your own calibration and image files when changing installations; there is no automatic migration.
 
 ## Fast ROI
 

@@ -1,0 +1,1 @@
+"""Filament Inspector web package."""

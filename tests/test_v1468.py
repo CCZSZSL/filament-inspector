@@ -8,9 +8,9 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 import numpy as np
-from filament_experiments_v1468 import (
+from filament_inspector.recording.experiments import (
     ExperimentLog, analyse, extract_result, new_row, paired_correlation, outlier_flags)
-from filament_diameter_ui_v1468 import FilamentUIV1468
+from filament_inspector.ui.experiments import ExperimentUI
 
 
 def measured(y=100., px=63., scale=1.75/63, quality=.94):
@@ -94,9 +94,9 @@ class AnalysisTest(unittest.TestCase):
 class GUITest(unittest.TestCase):
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory()
-        self.output_patch=patch('filament_diameter_ui_v1468.OUTPUT_ROOT',Path(self.tmp.name))
+        self.output_patch=patch('filament_inspector.ui.experiments.OUTPUT_ROOT',Path(self.tmp.name))
         self.output_patch.start()
-        self.app=FilamentUIV1468()
+        self.app=ExperimentUI()
         self.app.withdraw()
         lc=self.app.live_controls
         lc.background_epoch=('session','focus','settings')
@@ -165,7 +165,7 @@ class GUITest(unittest.TestCase):
         self.app._exp_start('static',50)
         self.assertIsNotNone(self.app._exp_job)
         self.assertIn('disabled',self.app.exp_static_button.state())
-        with patch('filament_diameter_ui_v1468.messagebox.showwarning') as warning:
+        with patch('filament_inspector.ui.experiments.messagebox.showwarning') as warning:
             self.app._exp_start('motion',100)
             self.app._toggle_continuous_button()
             self.assertEqual(warning.call_count,2)
@@ -212,7 +212,7 @@ class GUITest(unittest.TestCase):
     def test_real_gray8_png_snapshot_validation_path(self):
         """No Pi needed: exercise original client PNG decode/epoch/metadata path."""
         import cv2
-        from filament_live_integrated_v145 import IntegratedLiveControls
+        from filament_inspector.ui.camera_controls import IntegratedLiveControls
         lc=self.app.live_controls
         lc.capture_dir=Path(self.tmp.name)/'captures'
         self.app.background_cv=np.zeros((4608,2592,3),dtype=np.uint8)

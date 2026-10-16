@@ -1,6 +1,19 @@
 # Validation record
 
+## Modular framework branch — 16 October 2026
+
+- Branch: `refactor/modular-framework`; baseline `d7a953decb0363b63acaccee0b1978af9b328a44`.
+- All 96 tests passed with exit code 0 and no skips (28.210 seconds): the existing 92 regression cases plus four package-boundary/path/entry-point checks.
+- `python -X utf8 tools/compare_baseline.py` reported exact agreement for 43 deterministic cases, including numerical results, validity and error outcomes.
+- AST comparison confirmed that eight extracted helper functions, two engine methods and the background locator retain their original syntax trees.
+- Headless checks block imports of Tk, UI modules and Pi camera libraries while loading algorithm/calibration modules and exercising an intensity crossing.
+- Data-root tests verify that saved calibration and experiment output paths follow the selected writable root. Default paths remain checkout-relative; static web assets remain package-relative.
+- Historical GUI teardown diagnostics remain present. These tests do not establish live camera, physical accuracy, macOS deployment or throughput performance.
+- Runtime module locations/imports, UI class names and entry points were reorganized. The duplicate base web server/assets were consolidated into the current dashboard service. See [architecture](docs/ARCHITECTURE.md) for migration details and retained inheritance constraints.
+
 ## Repository cleanup — 16 October 2026
+
+The following is the earlier cleanup result on `main`, before modularization.
 
 - All 92 tests passed using `python -X utf8 -m unittest discover -s tests -p "test_*.py" -q` (25.473 seconds, exit code 0, no skipped tests).
 - Fast ROI UI tests now instantiate the retained v14.7.2 class. Existing pixel, epoch, stop/fallback and mocked camera tests were preserved.

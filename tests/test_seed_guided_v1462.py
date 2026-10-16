@@ -2,10 +2,10 @@
 import unittest
 import numpy as np
 import cv2
-from filament_seed_guided_v1462 import (
+from filament_inspector.algorithms.seed import (
     SCHEMA,SeedDetectionError,sample_record,build_model,measure_seeded,locate_seeded,validate_model,
 )
-from filament_three_view_core_v13 import new_view
+from filament_inspector.algorithms.views import new_view
 
 class SyntheticSeedTests(unittest.TestCase):
     def setUp(self):
@@ -83,7 +83,7 @@ class SyntheticSeedTests(unittest.TestCase):
             measure_seeded(self.cur,self.bg,(999,999),self.view)
 
     def test_mirror_local_scale_maintained(self):
-        from filament_three_view_core_v13 import VIEW_LABELS
+        from filament_inspector.algorithms.views import VIEW_LABELS
         self.view['name']='left'
         self.view['local_scale_calibration']={
             'original_image_size_wh':[self.height,self.width],

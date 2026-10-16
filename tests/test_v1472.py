@@ -7,7 +7,7 @@ from urllib.request import urlopen, Request
 from urllib.error import HTTPError
 import json
 import unittest
-from filament_web_v1472 import DashboardStore, LanDashboardServer, WEB_DIR
+from filament_inspector.web.server import DashboardStore, LanDashboardServer, WEB_DIR
 
 
 class WebAestheticTests(unittest.TestCase):
@@ -67,13 +67,13 @@ class WebAestheticTests(unittest.TestCase):
 
     def test_pi_files_stay_independent(self):
         root=Path(__file__).resolve().parents[1]
-        p=root/'filament_diameter_ui_v1472.py'
+        p=root/'filament_inspector'/'ui'/'app.py'
         text=p.read_text(encoding='utf-8')
-        self.assertIn('from filament_diameter_ui_v1470 import FilamentUIV1470',text)
-        self.assertIn('from filament_fast_roi_v1471 import',text)
-        self.assertIn('from filament_web_v1472 import',text)
-        self.assertIn('class FilamentUIV1472',text)
-        self.assertTrue((root/'pi_live_camera_server_v1471.py').is_file())
+        self.assertIn('from filament_inspector.ui.dashboard import DashboardUI',text)
+        self.assertIn('from filament_inspector.acquisition.roi import',text)
+        self.assertIn('from filament_inspector.web.server import',text)
+        self.assertIn('class FilamentInspectorApp',text)
+        self.assertTrue((root/'filament_inspector'/'camera.py').is_file())
 
 
 if __name__=='__main__':unittest.main()
