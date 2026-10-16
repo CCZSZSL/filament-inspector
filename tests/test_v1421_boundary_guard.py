@@ -1,6 +1,6 @@
 """Regression for v14.2 false failure from a handful of halo-affected columns.
 
-Run in Mac host terminal: python3 test_v1421_boundary_guard.py
+Run from the repository root: python3 -m unittest discover -s tests -p test_v1421_boundary_guard.py
 """
 from test_v142 import synthetic_metal
 from filament_silhouette_v142 import process_silhouette_view

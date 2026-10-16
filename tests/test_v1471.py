@@ -1,4 +1,4 @@
-"""Offline v14.7.1 ROI, transport, Tk control and LAN tests."""
+"""Regression tests for v14.7.1 Fast ROI features through the current v14.7.2 UI."""
 import io
 import unittest
 from unittest import mock
@@ -61,10 +61,10 @@ class RoiTests(unittest.TestCase):
         from_crop=cv2.cvtColor(rgb[y0:y1,:,:],cv2.COLOR_BGR2GRAY)
         self.assertTrue(np.array_equal(from_full,from_crop))
 
-    def test_legacy_web_static_files_untouched(self):
-        from filament_web_v1471 import WEB_DIR
+    def test_current_web_retains_heatmap_controls(self):
+        from filament_web_v1472 import WEB_DIR
         self.assertTrue((WEB_DIR/'dashboard.js').is_file())
-        html=(WEB_DIR/'index.html').read_text()
+        html=(WEB_DIR/'index.html').read_text(encoding='utf-8')
         self.assertIn('heatRejected',html)
         self.assertIn('heatMode',html)
 
@@ -78,7 +78,7 @@ class PiServiceTests(unittest.TestCase):
                                           'libcamera':types.ModuleType('libcamera')}):
             sys.modules['picamera2'].Picamera2=object
             sys.modules['libcamera'].controls=object
-            spec=importlib.util.spec_from_file_location('pi_fast_stub_v1471',Path(__file__).with_name('pi_live_camera_server_v1471.py'))
+            spec=importlib.util.spec_from_file_location('pi_fast_stub_v1471',Path(__file__).resolve().parents[1]/'pi_live_camera_server_v1471.py')
             mod=importlib.util.module_from_spec(spec);spec.loader.exec_module(mod)
             s=mod.CameraService.__new__(mod.CameraService)
             class FakeCamera:
@@ -113,8 +113,8 @@ class UITests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         try:
-            from filament_diameter_ui_v1471 import FilamentUIV1471
-            cls.cls=FilamentUIV1471
+            from filament_diameter_ui_v1472 import FilamentUIV1472
+            cls.cls=FilamentUIV1472
         except Exception as exc:
             raise unittest.SkipTest(str(exc))
 

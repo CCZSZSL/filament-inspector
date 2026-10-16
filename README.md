@@ -38,7 +38,7 @@ Use Raspberry Pi OS with a supported camera and Picamera2/libcamera installed th
 python3 pi_live_camera_server_v1471.py --help
 ```
 
-See [the camera and Fast ROI instructions](README_v1471.md) for camera parameters and SSH forwarding. The older `pi_live_camera_server_v145.py` is retained as a full-frame alternative. Run only one camera server at a time. Verify focus, exposure, gain and geometry before acquiring a background. Avoid port conflicts between the camera tunnel and host dashboard.
+See [the current setup guide](docs/SETUP.md) for camera parameters and SSH forwarding. The retained `pi_live_camera_server_v1471.py` supports both full-frame and Fast ROI acquisition. Run only one camera server at a time. Verify focus, exposure, gain and geometry before acquiring a background. Avoid port conflicts between the camera tunnel and host dashboard.
 
 ## Dashboard and data
 
@@ -50,14 +50,14 @@ The HTTP services do not provide authentication or TLS. Use a trusted network or
 
 This is a research/coursework prototype, not a certified measuring instrument. Repeatability, agreement between views and deviation from nominal diameter do not independently establish absolute accuracy. Calibration validity depends on optical geometry and operating conditions. The 3D display assumes circular cross-sections and estimates axial distance from feed speed and elapsed time; it does not measure full roundness or surface roughness.
 
-v14.7.2 changes the web interface while retaining the v14.7.1 measurement backend. Historical release notes include earlier experimental observations and provisional acceptance criteria; these are not new validation results for this public release. See [v14.7.2 notes](README_v1472.md).
+v14.7.2 changes the web interface while retaining the v14.7.1 measurement behavior. Historical release notes include earlier experimental observations and provisional acceptance criteria; these are not new validation results for this public release. See [the historical notes](docs/history/README.md).
 
 ## Offline tests
 
 With dependencies installed, run from the repository root:
 
 ```bash
-python -X utf8 -m unittest -q test_v1472 test_v1471 test_v1470 test_v1469 test_v1468 test_v1467 test_v1466 test_f_direct_v1463 test_dynamic_fusion_v1463 test_seed_guided_v1462 test_v142 test_v1421_boundary_guard
+python -X utf8 -m unittest discover -s tests -p "test_*.py" -q
 ```
 
 Some tests create Tk windows and require a graphical desktop (or a virtual display on Linux). Camera behavior is mocked; passing offline tests does not verify optical accuracy, real throughput, or physical hardware compatibility.
@@ -68,12 +68,15 @@ The `-X utf8` option avoids decoding failures on Windows installations whose def
 
 - `filament_diameter_ui_v1472.py`: current host entry point.
 - `filament_*.py`: acquisition, calibration, measurement and interface modules.
-- `pi_live_camera_server_v1471.py`: optional Fast ROI camera service.
+- `pi_live_camera_server_v1471.py`: camera service supporting full-frame and optional Fast ROI acquisition.
 - `web_v1472/`: current dashboard assets.
-- `test_*.py`: offline regression tests.
-- `README_v*.md`: historical release and operating notes.
+- `web_v1470/`: base dashboard retained for the inherited v14.7.0 UI and its tests.
+- `tests/`: offline regression tests, including Fast ROI tests against the current UI.
+- `docs/SETUP.md`: current camera/host setup.
+- `docs/history/`: historical release notes, not current launch instructions.
+- `docs/CODEBASE.md`: retained dependencies and reasons for removing superseded files.
 
-Older versioned modules and assets are retained because the current application inherits from them. Do not remove them solely because their names refer to an earlier version.
+The 38 retained Python runtime files form the import closure of the current host and camera entry points. Older filenames often identify active parent classes, not unused applications. See the [codebase audit](docs/CODEBASE.md) before removing or relocating them; several also resolve configuration and capture paths relative to their own file location.
 
 ## License
 

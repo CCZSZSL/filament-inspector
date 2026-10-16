@@ -1,4 +1,4 @@
-"""Run on Mac with a display, or Linux: xvfb-run -a python test_v142.py"""
+"""Run from the repository root with unittest discovery (see README)."""
 from __future__ import annotations
 import json
 from pathlib import Path
@@ -10,7 +10,7 @@ from filament_silhouette_v142 import process_silhouette_view
 from filament_three_view_core_v13 import new_view
 from filament_diameter_ui_v142_silhouette import SilhouetteThreeViewUI
 
-ROOT=Path(__file__).resolve().parent
+ROOT=Path(__file__).resolve().parents[1]
 
 
 def synthetic_metal(diameter):

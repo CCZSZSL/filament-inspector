@@ -66,9 +66,9 @@ class WebAestheticTests(unittest.TestCase):
             server.stop()
 
     def test_pi_files_stay_independent(self):
-        root=Path(__file__).resolve().parent
+        root=Path(__file__).resolve().parents[1]
         p=root/'filament_diameter_ui_v1472.py'
-        text=p.read_text()
+        text=p.read_text(encoding='utf-8')
         self.assertIn('from filament_diameter_ui_v1470 import FilamentUIV1470',text)
         self.assertIn('from filament_fast_roi_v1471 import',text)
         self.assertIn('from filament_web_v1472 import',text)

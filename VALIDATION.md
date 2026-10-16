@@ -1,4 +1,18 @@
-# Publication validation
+# Validation record
+
+## Repository cleanup — 16 October 2026
+
+- All 92 tests passed using `python -X utf8 -m unittest discover -s tests -p "test_*.py" -q` (25.473 seconds, exit code 0, no skipped tests).
+- Fast ROI UI tests now instantiate the retained v14.7.2 class. Existing pixel, epoch, stop/fallback and mocked camera tests were preserved.
+- All 38 remaining root Python files are reachable in the local import graph from the host and camera entry points. Dynamic/file-relative references were also reviewed.
+- Retained runtime Python files and v14.7.0/v14.7.2 web assets match the original public commit, allowing for Git newline normalization. No measurement algorithm was edited.
+- Current and historical Markdown links were checked; no broken local links were found.
+- Tk callback/theme cleanup diagnostics still occur during GUI test teardown, as in the initial publication run.
+- No new optical, live camera or macOS hardware validation was performed. No running Mac/Pi deployment was changed.
+
+The [codebase audit](docs/CODEBASE.md) documents all ten removed files and recovery from Git history.
+
+## Initial publication
 
 Date: 16 October 2026.
 
